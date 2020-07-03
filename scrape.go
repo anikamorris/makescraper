@@ -3,7 +3,11 @@ package main
 import (
 	"fmt"
 	// "net/http"
-	// "log"
+	"log"
+	// "strings"
+	"os"
+	"io/ioutil"
+	"encoding/json"
 	"github.com/gocolly/colly"
 )
 
@@ -12,6 +16,10 @@ type Apartment struct {
 	Sqft string
 	Price string
 	NumBedrooms string
+}
+
+type FullListing struct {
+	Listing string
 }
 
 // func scrapeHandler() {
@@ -47,15 +55,51 @@ type Apartment struct {
 
 // main() contains code adapted from example found in Colly's docs:
 // http://go-colly.org/docs/examples/basic/
-func main() {
-	c := colly.NewCollector()
 
+func AppendListingToFile(filename string, e FullListing) {
+	listingJSON, err := json.Marshal(e)
+	if err != nil {
+		log.Fatalf("failed to encode listing as json")
+	}
+
+	file, err := os.OpenFile("output.json", os.O_WRONLY|os.O_APPEND, 0644)
+    if err != nil {
+        log.Fatalf("failed opening file: %s", err)
+    }
+    defer file.Close()
+
+	jsonString := string(listingJSON)
+    _, err = file.WriteString(jsonString)
+    if err != nil {
+        log.Fatalf("failed writing to file: %s", err)
+    }
+}
+
+func main() {
+
+	c := colly.NewCollector()
+	var listings []FullListing
 	// On every a element which has href attribute call callback
 	// c.OnHTML(".list-card-price", func(e *colly.HTMLElement) {
 	// 	fmt.Printf("Price per month: %q\n", e.Text)
 	// })
 	c.OnHTML(".list-card-info", func(e *colly.HTMLElement) {
-		fmt.Printf("Full info card: %q\n\n", e.Text)
+		listing := FullListing{Listing: e.Text}
+		listings = append(listings, listing)
+		lJson, _ := json.Marshal(listing)
+		_ = ioutil.WriteFile("output.json", lJson, 0644)
+		
+		for _, listing := range listings {
+			AppendListingToFile("output.json", listing)
+		}
+		// fullText := strings.Split(e.Text, " ")
+		// address := make([]string, 10, 20)
+		// for i := 0; i < len(fullText); i++ {
+		// 	address.append(fullText[i])
+		// 	if fullText[i] == "CA" {
+		// 		break
+		// 	}
+		// }
 	})
 
 	// c.OnHTML(".list-card-details li:first-child", func(e *colly.HTMLElement) {
@@ -75,7 +119,12 @@ func main() {
 	c.OnRequest(func(r *colly.Request) {
 		fmt.Println("Visiting", r.URL.String())
 	})
-	
+
+	// Handle errors
+	c.OnError(func(_ *colly.Response, err error) {
+		log.Println("Something went wrong:", err)
+	})
+
 	c.Visit("https://www.zillow.com/homes/San-Francisco,-CA_rb/?searchQueryState=%7B%22pagination%22%3A%7B%7D%2C%22usersSearchTerm%22%3A%22San%20Francisco%2C%20CA%22%2C%22mapBounds%22%3A%7B%22west%22%3A-122.54679717016602%2C%22east%22%3A-122.31986082983398%2C%22south%22%3A37.68527794262908%2C%22north%22%3A37.8651955033787%7D%2C%22regionSelection%22%3A%5B%7B%22regionId%22%3A20330%2C%22regionType%22%3A6%7D%5D%2C%22filterState%22%3A%7B%22pmf%22%3A%7B%22value%22%3Afalse%7D%2C%22fore%22%3A%7B%22value%22%3Afalse%7D%2C%22auc%22%3A%7B%22value%22%3Afalse%7D%2C%22nc%22%3A%7B%22value%22%3Afalse%7D%2C%22fr%22%3A%7B%22value%22%3Atrue%7D%2C%22fsbo%22%3A%7B%22value%22%3Afalse%7D%2C%22cmsn%22%3A%7B%22value%22%3Afalse%7D%2C%22pf%22%3A%7B%22value%22%3Afalse%7D%2C%22fsba%22%3A%7B%22value%22%3Afalse%7D%7D%2C%22isListVisible%22%3Atrue%2C%22isMapVisible%22%3Atrue%2C%22mapZoom%22%3A12%7D")
 
 	// Start scraping on https://www.zillow.com/homes/for_rent/
