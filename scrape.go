@@ -69,7 +69,7 @@ func AppendListingToFile(filename string, e FullListing) {
     defer file.Close()
 
 	jsonString := string(listingJSON)
-    _, err = file.WriteString(jsonString)
+    _, err = file.WriteString(jsonString + ",\n")
     if err != nil {
         log.Fatalf("failed writing to file: %s", err)
     }
@@ -92,14 +92,7 @@ func main() {
 		for _, listing := range listings {
 			AppendListingToFile("output.json", listing)
 		}
-		// fullText := strings.Split(e.Text, " ")
-		// address := make([]string, 10, 20)
-		// for i := 0; i < len(fullText); i++ {
-		// 	address.append(fullText[i])
-		// 	if fullText[i] == "CA" {
-		// 		break
-		// 	}
-		// }
+		
 	})
 
 	// c.OnHTML(".list-card-details li:first-child", func(e *colly.HTMLElement) {
