@@ -11,6 +11,8 @@ import (
 	"github.com/gocolly/colly"
 )
 
+/* Apartment struct to keep track of address, square footage, 
+   price per month, and number of bedrooms */
 type Apartment struct {
 	Location string
 	Sqft string
@@ -18,6 +20,7 @@ type Apartment struct {
 	NumBedrooms string
 }
 
+/* struct to store the full listing before being processed */
 type FullListing struct {
 	Listing string
 }
@@ -56,13 +59,14 @@ type FullListing struct {
 // main() contains code adapted from example found in Colly's docs:
 // http://go-colly.org/docs/examples/basic/
 
+/* Writes listing to inputted file */
 func AppendListingToFile(filename string, e FullListing) {
 	listingJSON, err := json.Marshal(e)
 	if err != nil {
 		log.Fatalf("failed to encode listing as json")
 	}
 
-	file, err := os.OpenFile("output.json", os.O_WRONLY|os.O_APPEND, 0644)
+	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_APPEND, 0644)
     if err != nil {
         log.Fatalf("failed opening file: %s", err)
     }
@@ -78,6 +82,7 @@ func AppendListingToFile(filename string, e FullListing) {
 func main() {
 
 	c := colly.NewCollector()
+	// Keep track of all listings that we've found so far
 	var listings []FullListing
 	// On every a element which has href attribute call callback
 	// c.OnHTML(".list-card-price", func(e *colly.HTMLElement) {
