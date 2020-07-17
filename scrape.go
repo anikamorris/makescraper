@@ -7,7 +7,7 @@ import (
 	"strings"
 	"strconv"
 	"os"
-	// "io/ioutil"
+	"flag"
 	"encoding/json"
 	"github.com/gocolly/colly"
 	"regexp"
@@ -123,8 +123,11 @@ func filterApartmentsByPrice(apartments []Apartment, price int) []Apartment {
 }
 
 func main() {
+	pricePtr := flag.Int("price", 10000, "price to filter apartments")
 	apartments := homeView()
-	apartmentsInPriceRange := filterApartmentsByPrice(apartments, 4000)
-	fmt.Println(apartmentsInPriceRange)
-	// filterApartmentsByPrice(apartments, 4000)
+	flag.Parse()
+	apartmentsInPriceRange := filterApartmentsByPrice(apartments, *pricePtr)
+	for _, apartment := range apartmentsInPriceRange {
+		fmt.Printf("Price: %s\nLocation: %s\nDetails: %s\nLink: %s\n\n", apartment.Price, apartment.Location, apartment.Details, apartment.URL)
+	}
 }
