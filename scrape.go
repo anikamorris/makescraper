@@ -4,11 +4,13 @@ import (
 	"fmt"
 	// "net/http"
 	"log"
-	// "strings"
+	"strings"
+	"strconv"
 	"os"
 	// "io/ioutil"
 	"encoding/json"
 	"github.com/gocolly/colly"
+	"regexp"
 )
 
 /* Apartment struct to keep track of address, square footage, 
@@ -97,6 +99,32 @@ func detailView(location string, link string) Apartment {
 	return apartment
 }
 
+func filterApartmentsByPrice(apartments []Apartment, price int) []Apartment {
+	fmt.Println(price)
+	var apartmentsInPriceRange []Apartment
+	for _, apartment := range apartments {
+		if apartment.Price != "" {
+			aPrice := strings.Split(apartment.Price, "$")
+			fmt.Printf("apartment price: %s \n", aPrice[1])
+			reg, err := regexp.Compile("[^a-zA-Z0-9]+")
+			if err != nil {
+				log.Fatal(err)
+			}
+			processedPrice := reg.ReplaceAllString(aPrice[1], "")
+			intPrice, _ := strconv.Atoi(processedPrice)
+			// fmt.Printf("Int price: %s \n", priceNoComma)
+			if intPrice <= price {
+				fmt.Println(intPrice)
+				apartmentsInPriceRange = append(apartmentsInPriceRange, apartment)
+			}
+		}
+	}
+	return apartmentsInPriceRange
+}
+
 func main() {
-	fmt.Println(homeView())
+	apartments := homeView()
+	apartmentsInPriceRange := filterApartmentsByPrice(apartments, 4000)
+	fmt.Println(apartmentsInPriceRange)
+	// filterApartmentsByPrice(apartments, 4000)
 }
