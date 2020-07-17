@@ -57,7 +57,6 @@ func homeView() []Apartment {
 	// })
 	c.OnHTML(".list-card-link", func(e *colly.HTMLElement) {
 		link := e.Attr("href")
-		fmt.Printf("Link found: %s -> %s \n", e.Text, link)
 		apartment := detailView(e.Text, link)
 		listings = append(listings, apartment)
 	})
@@ -84,8 +83,6 @@ func detailView(location string, link string) Apartment {
 	c := colly.NewCollector()
 
 	c.OnHTML(".ds-summary-row", func(e *colly.HTMLElement) {
-		fmt.Println(e.ChildText(".ds-value"))
-		fmt.Println(e.ChildText(".ds-bed-bath-living-area"))
 		apartment.Details = e.ChildText(".ds-bed-bath-living-area")
 		apartment.Price = e.ChildText(".ds-value")
 	})
@@ -100,19 +97,16 @@ func detailView(location string, link string) Apartment {
 }
 
 func filterApartmentsByPrice(apartments []Apartment, price int) []Apartment {
-	fmt.Println(price)
 	var apartmentsInPriceRange []Apartment
 	for _, apartment := range apartments {
 		if apartment.Price != "" {
 			aPrice := strings.Split(apartment.Price, "$")
-			fmt.Printf("apartment price: %s \n", aPrice[1])
 			reg, err := regexp.Compile("[^a-zA-Z0-9]+")
 			if err != nil {
 				log.Fatal(err)
 			}
 			processedPrice := reg.ReplaceAllString(aPrice[1], "")
 			intPrice, _ := strconv.Atoi(processedPrice)
-			// fmt.Printf("Int price: %s \n", priceNoComma)
 			if intPrice <= price {
 				fmt.Println(intPrice)
 				apartmentsInPriceRange = append(apartmentsInPriceRange, apartment)
