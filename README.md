@@ -1,4 +1,4 @@
-# 🕷 makescraper
+# 🕷 makeHousing
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/anikamorris/makescraper)](https://goreportcard.com/report/github.com/anikamorris/makescraper)
 
@@ -7,49 +7,26 @@ _Create your very own web scraper and crawler using Go and [Colly](https://go-co
 ### 📚 Table of Contents
 
 1. [Project Structure](#project-structure)
-2. [Getting Started](#getting-started)
-3. [Deliverables](#deliverables)
+2. [Usage](#usage)
+3. [Some Background](#some-background)
 4. [Resources](#resources)
 
 ## Project Structure
 
 ```bash
 📂 makescraper
+├── output.json
 ├── README.md
 └── scrape.go
 ```
 
-## Deliverables
+## Usage
+Clone and cd into directory. Run `go build`, then `./makescraper`. If you would like to specify a maximum price, add and set a price flag when running ./makescraper. For example, if you wanted your maximum price to be 4000, it would look like `./makescraper -price=4000`
 
-_Complete each task in the order they appear. Use [GitHub Task List](https://help.github.com/en/github/managing-your-work-on-github/about-task-lists) syntax to update the task list._
-
-### Requirements
-
-#### Scraping
-
-- [x] **IMPORTANT**: Complete the Web Scraper Workflow worksheet distributed in class.
-- [x] Create a `struct` to store your data.
-- [x] Refactor the `c.OnHTML` callback on line `16` to use the selector(s) you tested while completing the worksheet.
-- [x] Print the data you scraped to `stdout`.
-
-##### Stretch Challenges
-
-- [x] Add more fields to your `struct`. Extract multiple data points from the website. Print them to `stdout` in a readable format.
-
-#### Serializing & Saving
-
-- [x] Serialize the `struct` you created to JSON. Print the JSON to `stdout` to validate it.
-- [x] Write scraped data to a file named `output.json`.
-- [x] **Add, commit, and push to GitHub**.
+## Some Background
+https://docs.google.com/presentation/d/14dSsrSytvioamio81eZ_juF1LEh_9xBuFMbOKNL5bWk/edit?usp=sharing
 
 ## Resources
-
-### Lesson Plans
-
-- [**BEW 2.5** - Scraping the Web](https://make-school-courses.github.io/BEW-2.5-Strongly-Typed-Languages/#/Lessons/WebScraping.md): Concepts and examples covered in class related to web scraping and crawling.
-
-### Example Code
-
 #### Scraping
 
 - [**Colly** - Docs](http://go-colly.org/docs/): Check out the sidebar for 20+ examples!
