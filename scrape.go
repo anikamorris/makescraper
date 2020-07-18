@@ -28,7 +28,7 @@ type FullListing struct {
 }
 
 /* Writes listing to inputted file */
-func AppendListingToFile(filename string, e FullListing) {
+func AppendListingToFile(filename string, e Apartment) {
 	listingJSON, err := json.Marshal(e)
 	if err != nil {
 		log.Fatalf("failed to encode listing as json")
@@ -47,14 +47,13 @@ func AppendListingToFile(filename string, e FullListing) {
     }
 }
 
+/* Visit the link for each listing*/
 func homeView() []Apartment {
 	c := colly.NewCollector()
 	// Keep track of all listings that we've found so far
 	var listings []Apartment
+
 	// On every a element which has href attribute call callback
-	// c.OnHTML(".list-card-price", func(e *colly.HTMLElement) {
-	// 	fmt.Printf("Price per month: %q\n", e.Text)
-	// })
 	c.OnHTML(".list-card-link", func(e *colly.HTMLElement) {
 		link := e.Attr("href")
 		apartment := detailView(e.Text, link)
@@ -75,6 +74,7 @@ func homeView() []Apartment {
 	return listings
 }
 
+/* Get details from link */
 func detailView(location string, link string) Apartment {
 	var apartment Apartment
 	apartment.Location = location
@@ -123,5 +123,6 @@ func main() {
 	apartmentsInPriceRange := filterApartmentsByPrice(apartments, *pricePtr)
 	for _, apartment := range apartmentsInPriceRange {
 		fmt.Printf("Price: %s\nLocation: %s\nDetails: %s\nLink: %s\n\n", apartment.Price, apartment.Location, apartment.Details, apartment.URL)
+		AppendListingToFile("output.json", apartment)
 	}
 }
